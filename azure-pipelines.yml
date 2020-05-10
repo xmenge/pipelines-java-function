@@ -12,14 +12,11 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
-
 # at the top of your YAML file 
 # set some variables that you'll need when you deploy
 variables:
   serviceConnectionToAzure: azureAccess
   appName: tailspin-space-game-leaderboard-300
-
-
 
 steps:
 - task: Maven@3
@@ -36,18 +33,6 @@ steps:
 # ...
 # add these as the last steps
 # to deploy to your app service
-- task: Maven@3
-  inputs:
-    mavenPomFile: 'pom.xml'
-    publishJUnitResults: true
-    testResultsFiles: '**/surefire-reports/TEST-*.xml'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.8'
-    mavenVersionOption: 'Default'
-    mavenOptions: '-Xmx3072m'
-    mavenAuthenticateFeed: false
-    effectivePomSkip: false
-    sonarQubeRunAnalysis: false
 - task: CopyFiles@2
   displayName: Copy Files
   inputs:
