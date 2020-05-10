@@ -9,6 +9,15 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
+
+# at the top of your YAML file 
+# set some variables that you'll need when you deploy
+variables:
+  serviceConnectionToAzure: azureAccess
+  appName: tailspin-space-game-leaderboard-300
+
+
+
 steps:
 - task: Maven@3
   inputs:
@@ -20,3 +29,26 @@ steps:
     publishJUnitResults: true
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
     goals: 'package'
+
+# ...
+# add these as the last steps
+# to deploy to your app service
+- task: CopyFiles@2
+  displayName: Copy Files
+  inputs:
+    SourceFolder: $(system.defaultworkingdirectory)/target/azure-functions/
+    Contents: '**'
+    TargetFolder: $(build.artifactstagingdirectory)   
+
+- task: PublishBuildArtifacts@1
+  displayName: Publish Artifact
+  inputs:
+    PathtoPublish: $(build.artifactstagingdirectory)    
+
+- task: AzureFunctionApp@1
+  displayName: Azure Function App deploy
+  inputs:
+    azureSubscription: $(serviceConnectionToAzure)
+    appType: functionApp
+    appName: $(appName)
+    package: $(build.artifactstagingdirectory)
